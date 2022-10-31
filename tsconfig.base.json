@@ -1,0 +1,29 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@fast-api/feature/content-managerment": [
+        "libs/feature/content-managerment/src/index.ts"
+      ],
+      "@fast-api/feature/table-managerment": [
+        "libs/feature/table-managerment/src/index.ts"
+      ],
+      "@fast-api/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@fast-api/ui/components": ["libs/ui/components/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
