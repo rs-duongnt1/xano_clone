@@ -8,7 +8,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { IsNonPrimitiveArray } from '../../../core/decorators/is-non-primitive-array';
-import { SchemaType } from '../../../core/enums/schema-type.enum';
+import { Schema as SchemaType } from '@fast-api/shared/models';
 
 export class Schema {
   @IsString()

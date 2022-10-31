@@ -1,9 +1,9 @@
-import { TableContent } from '../../table_content/entities/table_content.entity';
+import { TableContent } from '../table_content/table_content.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Schema } from '../dto/create-table.dto';
+import { ISchema, ITable } from '@fast-api/shared/models';
 
 @Entity({ name: 'db_tables' })
-export class Table {
+export class Table implements ITable {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,7 +16,7 @@ export class Table {
     type: 'json',
     nullable: true,
   })
-  schemas: Schema[];
+  schemas: ISchema[];
 
   @Column({
     nullable: true,

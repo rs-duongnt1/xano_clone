@@ -13,8 +13,13 @@
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
+      "@fast-api/feature/api-managerment": [
+        "libs/feature/api-managerment/src/index.ts"
+      ],
       "@fast-api/feature/content-managerment": [
         "libs/feature/content-managerment/src/index.ts"
       ],
@@ -22,6 +27,7 @@
         "libs/feature/table-managerment/src/index.ts"
       ],
       "@fast-api/shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@fast-api/shared/models": ["libs/shared/models/src/index.ts"],
       "@fast-api/ui/components": ["libs/ui/components/src/index.ts"]
     }
   },

@@ -5,11 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { CreateTableDrawer } from './components/create-table-drawer';
 import { List, Col, Row, Typography } from 'antd';
 import { useCreateTableMutation } from '@fast-api/shared/data-access';
+import { ITable } from '@fast-api/shared/models';
 
 export const FeatureTableManagerment = () => {
   const { data: tables } = useGetListTableQuery();
   const [createTable] = useCreateTableMutation();
-  const handleCreateTable = (data: any) => {
+  const handleCreateTable = (data: ITable) => {
     createTable(data);
   };
 
@@ -21,7 +22,7 @@ export const FeatureTableManagerment = () => {
       </Stack>
       <Typography.Title level={3}>Table List</Typography.Title>
       <Row gutter={16}>
-        {tables?.map((table: any) => (
+        {tables?.map((table) => (
           <Col
             span={8}
             key={table.id}
@@ -35,7 +36,7 @@ export const FeatureTableManagerment = () => {
               bordered
               dataSource={table.schemas || []}
               locale={{ emptyText: 'No records' }}
-              renderItem={(item: any) => (
+              renderItem={(item) => (
                 <List.Item>
                   <Typography.Text>{item.name}</Typography.Text>
                 </List.Item>

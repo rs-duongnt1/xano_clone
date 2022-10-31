@@ -1,11 +1,29 @@
-import { Button, Dropdown, Space, Table, Tag, Typography, Menu } from 'antd';
-import React, { useEffect, useState } from 'react';
+/*eslint @typescript-eslint/no-explicit-any: off*/
+import { Button, Space, Table, Tag, Typography } from 'antd';
+import { useEffect, useState } from 'react';
 import { PlusOutlined, DeleteFilled, ClearOutlined } from '@ant-design/icons';
 import { NewColumnDrawer } from './new-column-drawer';
 import { EditableCell } from './editable-cell';
 import { EditableRow } from './editable-row';
 import { Stack } from '@mui/system';
 import { useUpdateTableMutation } from '@fast-api/shared/data-access';
+import { ITable, ITableContent, ISchema } from '@fast-api/shared/models';
+import { ColumnsType } from 'antd/lib/table';
+import { SettingOutlined } from '@ant-design/icons';
+interface ContentTableProps {
+  table: ITable;
+  contents: ITableContent[];
+  generateContent: () => void;
+  handleSave: (value: any, record: ITableContent, dataIndex: string) => void;
+  deleteContents: (rowsSelected: ITableContent[]) => void;
+  loading: boolean;
+  refetchTable: () => void;
+}
+
+interface ITableData {
+  id: number;
+  item: any;
+}
 
 export const ContentTable = ({
   table,
@@ -15,19 +33,18 @@ export const ContentTable = ({
   deleteContents,
   loading = false,
   refetchTable,
-}: any) => {
-  const [data, setData] = useState<any>([]);
-  const [rowsSelected, setRowsSelected] = useState([]);
+}: ContentTableProps) => {
+  const [data, setData] = useState<ITableData[]>([]);
+  const [rowsSelected, setRowsSelected] = useState<ITableContent[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [openEditDrawer, setOpenEditDrawer] = useState(false);
   const [updateTable] = useUpdateTableMutation();
+  const [schemaSelected, setSchemaSelected] = useState<ISchema>();
 
   useEffect(() => {
     if (contents) {
       setData([
-        // eslint-disable-next-line no-unsafe-optional-chaining
-        ...contents?.map((content: any) => ({
+        ...contents.map((content) => ({
           id: content.id,
           item: content.item,
           key: content.id,
@@ -36,7 +53,7 @@ export const ContentTable = ({
     }
   }, [contents]);
 
-  const handleUpdateTable = (schema: any, oldSchema: any) => {
+  const handleUpdateTable = (schema: ISchema, oldSchema?: ISchema) => {
     const dataUpdated = {
       name: table.name,
       schemas: [...(table.schemas || []), schema],
@@ -44,7 +61,7 @@ export const ContentTable = ({
     if (oldSchema) {
       const newSchemas = [...table.schemas];
       const schemaIndex = table.schemas.findIndex(
-        (_schema: any) => oldSchema.name === _schema.name
+        (_schema) => oldSchema.name === _schema.name
       );
       newSchemas[schemaIndex] = schema;
       dataUpdated.schemas = newSchemas;
@@ -53,46 +70,58 @@ export const ContentTable = ({
     updateTable({ tableId: table.id, dataUpdated }).then(() => {
       refetchTable();
       setOpenDrawer(false);
-      setOpenEditDrawer(false);
     });
   };
 
-  const tableColumns = table?.schemas?.map((schema: any) => ({
-    title: (
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography.Text strong>{schema.name}</Typography.Text>
-          <Tag color="magenta">{schema.type}</Tag>
+  const tableColumns: ColumnsType<ITableData> = table?.schemas?.map(
+    (schema: ISchema) => ({
+      title: (
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Typography.Text strong>{schema.name}</Typography.Text>
+            <Tag color="magenta">{schema.type}</Tag>
+          </Stack>
+
+          <SettingOutlined
+            onClick={() => {
+              setSchemaSelected(schema);
+              setOpenDrawer(true);
+            }}
+          />
+
+          {/* <NewColumnDrawer
+            schema={schema}
+            open={openEditDrawer}
+            onClose={() => setOpenEditDrawer(false)}
+            onClick={() => setOpenEditDrawer(true)}
+            create={handleUpdateTable}
+            init
+          /> */}
         </Stack>
+      ),
+      dataIndex: schema.name,
+      key: schema.name,
+      render: (value, content) => {
+        return <div>{content.item[schema.name]}</div>;
+      },
+      onCell: (record: ITableData) => {
+        return {
+          record,
+          width: '240px',
+          dataIndex: schema.name,
+          editable: true,
+          handleSave,
+          schema,
+        };
+      },
+    })
+  );
 
-        <NewColumnDrawer
-          schema={schema}
-          open={openEditDrawer}
-          onClose={() => setOpenEditDrawer(false)}
-          onClick={() => setOpenEditDrawer(true)}
-          create={handleUpdateTable}
-          init
-        />
-      </Stack>
-    ),
-    dataIndex: schema.name,
-    key: schema.name,
-    render: (text: any, value: any) => {
-      return <div>{value.item[schema.name]}</div>;
-    },
-    onCell: (record: any) => {
-      return {
-        record,
-        width: '240px',
-        dataIndex: schema.name,
-        editable: true,
-        handleSave,
-        schema,
-      };
-    },
-  }));
-
-  const columns = [
+  const columns: ColumnsType<ITableData> = [
     {
       title: (
         <Space>
@@ -103,26 +132,25 @@ export const ContentTable = ({
       dataIndex: 'id',
       key: 'id',
       width: '140px',
-      onCell: (record: any) => {
+      onCell: (record: ITableData) => {
         return {
           record,
+          title: 'id',
           dataIndex: 'id',
         };
       },
-      render: (text: any) => <div>{text}</div>,
+      render: (text: string) => <div>{text}</div>,
     },
     ...(tableColumns || []),
     {
       width: '50px',
       title: (
-        <NewColumnDrawer
-          schema={null}
-          open={openDrawer}
-          onClose={() => setOpenDrawer(false)}
+        <Button
+          type="primary"
+          shape="circle"
           onClick={() => setOpenDrawer(true)}
-          create={handleUpdateTable}
-          init={false}
-        />
+          icon={<PlusOutlined />}
+        ></Button>
       ),
       dataIndex: 'new',
       key: 'new',
@@ -146,72 +174,83 @@ export const ContentTable = ({
   };
 
   return (
-    <Table
-      loading={loading}
-      components={{
-        body: {
-          cell: EditableCell,
-          row: EditableRow,
-        },
-      }}
-      tableLayout="fixed"
-      scroll={{ x: 'max-content', y: 600 }}
-      bordered
-      columns={columns}
-      dataSource={data}
-      rowClassName={() => 'editable-row'}
-      pagination={false}
-      rowSelection={{
-        type: 'checkbox',
-        onChange: onSelectChange,
-        selectedRowKeys,
-        fixed: 'left',
-      }}
-      title={() => (
-        <Stack
-          sx={{
-            height: '32px',
-          }}
-        >
-          {rowsSelected.length === 0 && (
-            <Space>
-              <Button icon={<ClearOutlined />} danger>
-                Clear Data
-              </Button>
-            </Space>
-          )}
-          {rowsSelected.length > 0 && (
-            <Space>
-              <Typography.Text>
-                {rowsSelected.length}{' '}
+    <>
+      <Table
+        loading={loading}
+        components={{
+          body: {
+            cell: EditableCell,
+            row: EditableRow,
+          },
+        }}
+        tableLayout="fixed"
+        scroll={{ x: 'max-content', y: 600 }}
+        bordered
+        columns={columns}
+        dataSource={data}
+        rowClassName={() => 'editable-row'}
+        pagination={false}
+        rowSelection={{
+          type: 'checkbox',
+          onChange: onSelectChange,
+          selectedRowKeys,
+          fixed: 'left',
+        }}
+        title={() => (
+          <Stack
+            sx={{
+              height: '32px',
+            }}
+          >
+            {rowsSelected.length === 0 && (
+              <Space>
+                <Button icon={<ClearOutlined />} danger>
+                  Clear Data
+                </Button>
+              </Space>
+            )}
+            {rowsSelected.length > 0 && (
+              <Space>
                 <Typography.Text>
-                  record{rowsSelected.length !== 1 && 's'}
-                </Typography.Text>{' '}
-                selected
-              </Typography.Text>
-              <Button
-                type="primary"
-                icon={<DeleteFilled />}
-                danger
-                onClick={confirmedDelete}
-              >
-                Delete
-              </Button>
-              <Button type="default" onClick={cancelDelete}>
-                Cancel
-              </Button>
-            </Space>
-          )}
-        </Stack>
-      )}
-      footer={() => (
-        <Button
-          type="dashed"
-          shape="circle"
-          icon={<PlusOutlined />}
-          onClick={generateContent}
-        ></Button>
-      )}
-    />
+                  {rowsSelected.length}{' '}
+                  <Typography.Text>
+                    record{rowsSelected.length !== 1 && 's'}
+                  </Typography.Text>{' '}
+                  selected
+                </Typography.Text>
+                <Button
+                  type="primary"
+                  icon={<DeleteFilled />}
+                  danger
+                  onClick={confirmedDelete}
+                >
+                  Delete
+                </Button>
+                <Button type="default" onClick={cancelDelete}>
+                  Cancel
+                </Button>
+              </Space>
+            )}
+          </Stack>
+        )}
+        footer={() => (
+          <Button
+            type="dashed"
+            shape="circle"
+            icon={<PlusOutlined />}
+            onClick={generateContent}
+          ></Button>
+        )}
+      />
+      <NewColumnDrawer
+        open={openDrawer}
+        schema={schemaSelected}
+        onClose={() => {
+          setOpenDrawer(false);
+          setSchemaSelected(undefined);
+        }}
+        create={handleUpdateTable}
+      />
+    </>
   );
 };

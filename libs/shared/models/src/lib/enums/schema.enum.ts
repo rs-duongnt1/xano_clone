@@ -1,4 +1,4 @@
-export enum SchemaType {
+export enum Schema {
   INTEGER = 'integer',
   DECIMAL = 'decimal',
   // ATTACHMENT = 'attachment',

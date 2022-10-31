@@ -1,10 +1,10 @@
-import { Table } from './../table/entities/table.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import { Table } from '../table/table.entity';
 import { CreateTableContentDto } from './dto/create-table_content.dto';
 import { UpdateTableContentDto } from './dto/update-table_content.dto';
-import { TableContent } from './entities/table_content.entity';
+import { TableContent } from './table_content.entity';
 
 @Injectable()
 export class TableContentService {

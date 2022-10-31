@@ -1,8 +1,14 @@
 import { PlusOutlined } from '@ant-design/icons';
+import { ITable } from '@fast-api/shared/models';
 import { Stack } from '@mui/material';
 import { Button, Col, Drawer, Form, Input, Row } from 'antd';
 import React, { useState } from 'react';
-export const CreateTableDrawer = ({ create }: any) => {
+
+interface CreateTableDrawerProps {
+  create: (table: ITable) => void;
+}
+
+export const CreateTableDrawer = ({ create }: CreateTableDrawerProps) => {
   const [open, setOpen] = useState(false);
   const showDrawer = () => {
     setOpen(true);

@@ -1,6 +1,8 @@
 import { DatePicker, Input, InputNumber } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import moment from 'moment';
+import { useIMask } from 'react-imask';
+import { Box } from '@mui/material';
 
 export const EditableCell = ({
   title,
@@ -15,9 +17,17 @@ export const EditableCell = ({
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(record?.item[dataIndex]);
   const inputRef = useRef<any>(null);
+  const { ref } = useIMask({
+    mask: Number,
+  });
   useEffect(() => {
     if (editing) {
-      inputRef?.current?.focus();
+      if (ref.current) {
+        ref.current?.focus();
+      }
+      if (inputRef.current) {
+        inputRef?.current?.focus();
+      }
     }
   }, [editing]);
 
@@ -53,6 +63,27 @@ export const EditableCell = ({
             onPressEnter={save}
             type="number"
           />
+        );
+      }
+
+      if (schema.type === 'decimal') {
+        childNode = (
+          <Box
+            component="input"
+            ref={ref}
+            defaultValue={value}
+            onBlur={save}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                save(e);
+              }
+            }}
+            sx={{
+              padding: '4px 11px',
+              width: '100%',
+              outline: 'none',
+            }}
+          ></Box>
         );
       }
 

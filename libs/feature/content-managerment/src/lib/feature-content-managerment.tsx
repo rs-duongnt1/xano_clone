@@ -1,3 +1,4 @@
+/*eslint @typescript-eslint/no-explicit-any: off*/
 import { Stack } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import {
@@ -10,6 +11,7 @@ import {
 import { ContentTable } from './components/content-table';
 import { Typography } from 'antd';
 import './feature-content-managerment.scss';
+import { ITableContent } from '@fast-api/shared/models';
 
 export const FeatureContentManagerment = () => {
   const { id } = useParams();
@@ -28,18 +30,20 @@ export const FeatureContentManagerment = () => {
     });
   };
 
-  const handleSave = (value: any, record: any, dataIndex: any) => {
+  const handleSave = (value: any, record: ITableContent, dataIndex: string) => {
     updateContent({
       tableId: id,
       contentId: record.id,
       dataUpdated: { ...record.item, [dataIndex]: value },
-    }).then((res) => {});
+    }).then((res) => {
+      console.log('save success');
+    });
   };
 
-  const handleDeleteContents = (contents: any) => {
+  const handleDeleteContents = (contents: ITableContent[]) => {
     deleteMultipleContents({
       tableId: id,
-      contentIds: contents.map((content: any) => content.id),
+      contentIds: contents.map((content) => content.id),
     }).then(() => {
       refetchContents();
     });

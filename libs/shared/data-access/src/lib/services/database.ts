@@ -1,3 +1,4 @@
+import { ITable } from '@fast-api/shared/models';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './baseQuery';
 
@@ -6,7 +7,7 @@ export const databaseApi = createApi({
   reducerPath: 'database',
   tagTypes: [],
   endpoints: (builder) => ({
-    getListTable: builder.query<any, void>({
+    getListTable: builder.query<ITable[], void>({
       query: () => ({
         url: 'tables',
       }),

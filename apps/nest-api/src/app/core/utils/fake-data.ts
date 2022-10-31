@@ -1,7 +1,6 @@
-import { Schema } from '../../modules/table/dto/create-table.dto';
-import { SchemaType } from '../enums/schema-type.enum';
+import { Schema as SchemaType, ISchema } from '@fast-api/shared/models';
 
-export function generateDataBySchemas(schemas: Schema[]): any {
+export function generateDataBySchemas(schemas: ISchema[]): any {
   const data = {};
   for (const schema of schemas) {
     if (schema.type === SchemaType.INTEGER) {

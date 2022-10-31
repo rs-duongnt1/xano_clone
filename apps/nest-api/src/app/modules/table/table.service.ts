@@ -1,18 +1,18 @@
-import { Table } from './entities/table.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Table } from './table.entity';
 
 @Injectable()
 export class TableService {
   constructor(
     @InjectRepository(Table)
-    private tableRepository: Repository<Table>,
+    private tableRepository: Repository<Table>
   ) {}
   async create(createDatabaseDto: CreateTableDto) {
-    return await this.tableRepository.save(createDatabaseDto);
+    return await this.tableRepository.save(createDatabaseDto as any);
   }
 
   findAll() {
@@ -37,7 +37,7 @@ export class TableService {
   }
 
   update(id: number, updateDatabaseDto: UpdateTableDto) {
-    return this.tableRepository.update(id, updateDatabaseDto as Table);
+    return this.tableRepository.update(id, updateDatabaseDto as any);
   }
 
   remove(id: number) {
